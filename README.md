@@ -37,6 +37,10 @@ UML graph
 ---
 See LTE_session_control_center_uml.png at {source code root}<br>
 
+UT coverage
+---
+50%
+
 v1.0
 ---
 1. Start multiple sessions.<br>
