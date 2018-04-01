@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DeliverySession Version="v1.0">
+    <DeliverySessionId>1000</DeliverySessionId>
+    <Action>Start</Action>
+    <!--<TMGIPool>STH</TMGIPool>-->
+    <TMGI>STH</TMGI>
+    <StartTime>0</StartTime>
+    <StopTime>100</StopTime>
+</DeliverySession>
