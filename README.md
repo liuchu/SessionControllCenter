@@ -46,3 +46,11 @@ v1.0
 1. Start multiple sessions.<br>
 2. Stop single sessions.<br>
 3. Stop all sessions<br>
+
+
+v1.1 
+---
+changes:<br>
+ 1. Repalce required collection with thread-safe collection. <br>
+ 2. Fix factory not singleton issue. <br>
+ 3. Delegate all session related threads to a fixed thread pool(max allowed threads is 100).<br>
