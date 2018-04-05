@@ -11,10 +11,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @ClassName: HttpServletContextHelper
@@ -61,9 +59,13 @@ public class HttpServletContextHelper implements ServletContextListener {
      * @return void
      */
     private void initData(ServletContext servletContext){
-        Map<Integer,LTESession> startedItems = new HashMap<Integer,LTESession>();
-        List<LTESession> startingItems = new ArrayList<LTESession>();
-        List<LTESession> failedItems = new ArrayList<LTESession>();
+
+        /* v1.1
+         * Replace with thread-safe collections
+         */
+        ConcurrentHashMap<Integer,LTESession> startedItems = new ConcurrentHashMap<Integer,LTESession>();
+        List<LTESession> startingItems = Collections.synchronizedList(new ArrayList<LTESession>());
+        List<LTESession> failedItems = Collections.synchronizedList(new ArrayList<LTESession>());
 
         if (servletContext==null){
             System.out.println("servletContext is NULL !!!");

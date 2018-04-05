@@ -15,6 +15,9 @@ import javax.servlet.ServletContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @ClassName: SessionServiceImpl
@@ -26,6 +29,9 @@ import java.util.Map;
 public class SessionServiceImpl implements SessionService {
 
     private static Logger logger = Logger.getLogger(SessionServiceImpl.class);
+
+    //v1.1, delegate all session threads to a "FixedThreadPool", max threads amount is 50
+    private static  ExecutorService service = Executors.newFixedThreadPool(100);
 
     /**
      * @Title: startSessions
@@ -53,7 +59,8 @@ public class SessionServiceImpl implements SessionService {
 
             //Start multiple threads to send post requests.
             Thread thread = new Thread(new HandleSessionThread(lteSession,"http://localhost:8081/"));
-            thread.start();
+            //v1.1, using ExecutorService to manage threads.
+            service.submit(thread);
         }
 
     }
@@ -71,13 +78,8 @@ public class SessionServiceImpl implements SessionService {
         lteSession.setDeliverySessionId(sessionId);
 
         Thread thread = new Thread(new HandleSessionThread(lteSession,"http://localhost:8081/"));
-        thread.start();
-
-/*      try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        //v1.1, using ExecutorService to manage threads.
+        service.submit(thread);
 
     }
 
@@ -89,12 +91,17 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void stopAllSessions() {
         ServletContext context = HttpServletContextHelper.getServletContext();
-        Map<Integer,LTESession> startedItems = (Map<Integer,LTESession>) context.getAttribute("startedItems");
+        ConcurrentHashMap<Integer,LTESession> startedItems =
+                (ConcurrentHashMap<Integer,LTESession>) context.getAttribute("startedItems");
 
         logger.debug("SessionServiceImpl > stopAllSessions");
-        for (int sessionId: startedItems.keySet()) {
-            logger.debug("foreach"+sessionId);
-            stopSession(sessionId);
+
+        //v1.1, "synchronized" is required when iterate
+        synchronized (startedItems) {
+            for (int sessionId: startedItems.keySet()) {
+                logger.debug("foreach"+sessionId);
+                stopSession(sessionId);
+            }
         }
 
     }
