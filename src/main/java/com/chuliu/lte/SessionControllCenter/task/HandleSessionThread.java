@@ -8,6 +8,7 @@ import com.chuliu.lte.SessionControllCenter.util.LTERestAPI;
 import com.chuliu.lte.SessionControllCenter.util.XmlFormatValidator;
 import org.apache.log4j.Logger;
 import org.springframework.util.ResourceUtils;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -28,6 +29,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @ClassName: HandleSessionThread
@@ -42,14 +44,17 @@ public class HandleSessionThread implements Runnable {
 
     private LTESession lteSession;
     private String serverURL;
-    private DocumentBuilderFactory documentFactory;
-    private TransformerFactory transFactory;
+
+    //v1.0, update to static to ensure singleton
+    private static DocumentBuilderFactory documentFactory;
+    private static TransformerFactory transFactory;
 
     private ServletContext context = HttpServletContextHelper.getServletContext();
 
     private List<LTESession> startingItems = (List<LTESession>) context.getAttribute("startingItems");
     private List<LTESession> failedItems = (List<LTESession>) context.getAttribute("failedItems");
-    private Map<Integer,LTESession> startedItems = (Map<Integer,LTESession>) context.getAttribute("startedItems");
+    private ConcurrentHashMap<Integer,LTESession> startedItems =
+            (ConcurrentHashMap<Integer,LTESession>) context.getAttribute("startedItems");
 
     /**
      * @Title: HandleSessionThread
